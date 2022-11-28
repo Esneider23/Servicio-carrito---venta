@@ -1,10 +1,13 @@
 # we invoke the necessary libraries
 from flask import Flask, render_template
 from flask_mysqldb import MySQL
+from flask_cors import CORS, cross_origin
 import shop
 
 # The access point is created
 server = Flask(__name__)
+
+CORS(server)
 
 # The connection point to the base is created
 server.config['MYSQL_HOST'] = 'us-cdbr-east-06.cleardb.net'
@@ -17,6 +20,7 @@ mysql = MySQL(server)
 shop_car = []
 
 
+@cross_origin
 # The route to enter the service is created
 @server.get('/')
 def index():
@@ -29,24 +33,28 @@ def index():
     except Exception as ex:
         return "Error"
 
+@cross_origin
 # Function that returns items from the shopping cart.
 @server.get('/shop')
 def car():
     return shop.show_shopping_car(shop_car)
 
 
+@cross_origin
 # Function that adds items to shopping cart.
 @server.post('/shop')
 def shopping_car():
     return shop.add_shopping_car(mysql, shop_car)
 
 
+@cross_origin
 # Function that performs the shopping cart purchase and updates the database.
 @server.put('/buy')
 def buy():
     return shop.complete_buy(mysql, shop_car)
 
 
+@cross_origin
 # A function is created to show when a page is not found.
 def page_not_found(error):
     return render_template('404.html')
